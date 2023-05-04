@@ -12,7 +12,7 @@
 
    1. Istio
 
-      ![istio](Service Mesh.assets/istio.jpg)
+      ![istio](ServiceMesh.assets/istio.jpg)
 
       1. 数据平面
 
@@ -40,7 +40,7 @@
         >
         >RPC 客户端 -> 与自身同主机部署的 Sidecar（处理服务发现、负载均衡、服务路由、流量控制之后）-> 指定服务节点的 Sidecar（记录访问日志、记录分布式追踪日志、限流之后）-> RPC 服务端
 
-        ![sidecar](Service Mesh.assets/sidecar.jpg)
+        ![sidecar](ServiceMesh.assets/sidecar.jpg)
 
    2. 实现方案
 
@@ -50,17 +50,17 @@
 
            > Istio 默认使用该方案，属于流量劫持的方案
 
-           > Iptables 是 Linux 内核中，防火墙软件 Netfilter 的管理工具，它位于用户空间，可以控制 Netfilter，实现地址转换的功能。在 iptables 中默认有五条链，你可以把这五条链，当作数据包流转过程中的五个步骤，依次为 PREROUTING，INPUT，FORWARD，OUTPUT 和 POSTROUTING。数据包传输的大体流程如下![iptable](Service Mesh.assets/iptable.jpg)
+           > Iptables 是 Linux 内核中，防火墙软件 Netfilter 的管理工具，它位于用户空间，可以控制 Netfilter，实现地址转换的功能。在 iptables 中默认有五条链，你可以把这五条链，当作数据包流转过程中的五个步骤，依次为 PREROUTING，INPUT，FORWARD，OUTPUT 和 POSTROUTING。数据包传输的大体流程如下![iptable](ServiceMesh.assets/iptable.jpg)
            >
            > 数据包以 PREROUTING 链作为入口，当数据包目的地为本机时，它们也都会流经到 OUTPUT 链。所以，我们可以在这两个链上，增加一些规则，将数据包重定向
 
            流入流量实现
 
-           ![inbound](Service Mesh.assets/inbound.jpg)
+           ![inbound](ServiceMesh.assets/inbound.jpg)
 
            流出流量实现
 
-           ![outbound](Service Mesh.assets/outbound.jpg)
+           ![outbound](ServiceMesh.assets/outbound.jpg)
 
            1. 优势
               1. 对业务完全透明
@@ -71,7 +71,7 @@
 
            > 国内大厂较为喜欢选择的方案，属于流量转发的方案
 
-           ![client](Service Mesh.assets/client.jpg)
+           ![client](ServiceMesh.assets/client.jpg)
 
            1. 前提
               1. Sidecar使用一个轻量级客户端实现
