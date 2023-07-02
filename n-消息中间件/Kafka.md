@@ -191,14 +191,16 @@
 
            2. Replica 多副本机制
 
-              同组分区的不同副本分布在不同的 Broker 上，保存相同的消息(可能有滞后)
+              Kafka 中，复制的基本单位是分区，同组分区的不同副本分布在不同的 Broker 上，保存相同的消息(可能有滞后)
 
               副本之间是“一主多从”的关系，其中 leader 副本负责处理读写请求，follower 副本负责从 leader 拉取消息进行同步
 
-              * 概念
+              消息在写入到主节点之后，并不会马上返回写入成功，而是等待足够多的节点(设置的ISR数量)都复制成功后再返回
 
+              * 概念
+           
                 *  AR（Assigned Replicas） 所有副本
-                *  ISR（In-Sync Replicas） 与 leader 副本保持一定同步的副本
+                *  ISR（In-Sync Replicas） 与 leader 副本保持一定同步的副本(ISR包括主节点)
                 *  OSR（Out-of-Sync Replicas）与 leader 同步滞后过多的副本
 
                 > AR=ISR+OSR
@@ -250,7 +252,7 @@
                    * **LEO**
 
                       Log End Offset，表示当前 log 文件中下一条待写入消息的 offset；
-
+           
                    > 所有副本都有对应的 HW 和 LEO
                    >
                    > Kafka 使用 Leader 副本的高水位来定义所在分区的高水位，即分区的高水位就是其 Leader 副本的高水位
@@ -268,7 +270,7 @@
                    * 第一次fetch
 
                      ![图片](Kafka.assets/640-20230509101341945.jpeg)
-
+           
                      * Leader 收到Producer发来的一条消息完成存储, 更新LEOL=1;
                      * Follower从Leader fetch数据,  Leader收到请求，记录follower的LEOF =0，并且尝试更新HWL =min(全部副本LEO)=0；
                      * Leader返回HWL=0和LEOL=1给Follower，Follower存储消息并更新LEOF =1, HWF=min(LEOF，HWL)=0。
@@ -276,7 +278,7 @@
                    * 第二次 fetch
 
                      ![图片](Kafka.assets/640-20230509175850443.jpeg)
-
+           
                      * Follower再次从Leader fetch数据,  Leader收到请求，记录follower的LEOF =1，并且尝试更新HWL =min(全部副本LEO)=1；
                      * Leader返回HWL=1和LEOL=1给Follower，Follower收到请求，更新自己的 HWF=min(LEOF，HWL)=1。
 
@@ -305,19 +307,19 @@
                         ![图片](Kafka.assets/640-20230509235125767.jpeg)
 
                       * 数据错乱
-
+           
                         ![图片](Kafka.assets/640-20230509235203499.jpeg)
 
       * 消费者从 Broker 消费到消息且最好只消费一次
 
         > 风险：跨网络消息传输的可靠性
-   
+
         通常是通过手动提交+幂等实现消息的可靠消费
-   
+
         1. 自动提交和手动提交
-   
+
            ![图片](Kafka.assets/640-20230508184907458.png)
-   
+
    2. 精确一次（exactly once）的实现
 
       幂等性（Idempotence）和事务（Transaction）
