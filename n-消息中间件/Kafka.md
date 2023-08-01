@@ -326,7 +326,16 @@
 
       ![图片](Kafka.assets/640.png)
 
+   > Kafka 的Exactly Once和我们通常理解的消息队列的服务水平中的 Exactly Once 是不一样的
+   >
+   > 通常理解： 消息从生产者发送到 Broker，然后消费者再从 Broker 拉取消息，然后进行消费。这个过程中，确保每一条消息恰好传输一次，不重不丢
+   >
+   > Kafka 的 Exactly Once： 在流计算中，用 Kafka 作为数据源，并且将计算结果保存到 Kafka 这种场景下，数据从 Kafka 的某个主题中消费，在计算集群中计算，再把计算结果保存在 Kafka 的其他主题中。这样的过程中，保证每条消息都被恰好计算一次，确保计算结果正确。
+   >
+   > ![kafka-exactly-once](Kafka.assets/kafka-exactly-once.png) 
+
 6. 高性能的设计
+
    * 异步发送
 
      同步发送本质上也是异步的，但是在处理结果时，同步发送通过 waitGroup 将异步操作转换为同步，以最大化提高消息发送的吞吐能力
@@ -432,25 +441,25 @@
      一个topic多partition->不同partition分布在不同broker
 
      提供了 并行的消息处理能力 和 横向扩容能力
-   
+
    * 多 reactor 多线程网络模型
-   
+
      Broker 端处理消息时采用了多 reactor 多线程模型
-   
+
      ![图片](Kafka.assets/640-20230510002844026.jpeg)
-   
+
      * 组件
-   
+
        * SocketServer
-   
+
          实现 Reactor 模式，用于处理多个 Client（包括客户端和其他 broker 节点）的并发请求，并将处理结果返回给 Client
-   
+
        * KafkaRequestHandlerPool
-   
+
          Reactor 模式中的 Worker 线程池，里面定义了多个工作线程，用于处理实际的 I/O 请求逻辑。
-   
+
      * 步骤
-   
+
        1. Acceptor 接收客户端发来的请求
        2. 轮询分发给 Processor 线程处理
        3. Processor 将请求封装成 Request 对象，放到 RequestQueue 队列
